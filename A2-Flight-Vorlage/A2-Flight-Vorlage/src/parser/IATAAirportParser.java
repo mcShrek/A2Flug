@@ -7,14 +7,13 @@ import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
-import java.sql.SQLOutput;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Scanner;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-public class IATAAirportParser  extends AbstractParser{
+public class IATAAirportParser  extends AbstractParser<Airport>{
 
 
     public IATAAirportParser(String resourceRoot, String iataPagePath, String iataCodesDir) {
@@ -25,41 +24,35 @@ public class IATAAirportParser  extends AbstractParser{
 
         ArrayList<Airport> airports = new ArrayList<Airport>();
 
-        for(char ch = 'A'; ch<= 'Z'; ch++) {
+        //Schleife, um über jede Datei zu iterieren
+        for(char fileChar = 'A'; fileChar <= 'Z'; fileChar++) {
 
-            Path path = Paths.get(resourceRoot, iataCodesDir, ch + ".html");
+            Path path = Paths.get(resourceRoot, iataCodesDir, fileChar + ".html");
+
+            // öffnet einen Scanner zum Lesen Seite "Liste_der_IATA-Flughafen-Codes.html"
             Scanner scanner = new Scanner(path.toUri().toURL().openStream(),
                     StandardCharsets.UTF_8);
 
             if (!Files.isReadable(path)) {
-                System.out.println("Fehler");
-                //System.out.println(iataPagePath.toAbsolutePath());
+                System.out.println("Fehler beim Lesen der Datei mit: " + fileChar);
+
                 continue;
 
             }
 
-            String data;
-            // öffnet einen Scanner zum Lesen Seite "Liste_der_IATA-Flughafen-Codes.html"
-//        Scanner scanner = new Scanner(iataPagePath.toUri().toURL().openStream(),
-//                StandardCharsets.UTF_8);
-            data = scanner.useDelimiter("\\A").next();
+
+            String data = scanner.useDelimiter("\\A").next();
             Pattern formatAirports = Pattern.compile(
 
-//                        "<td>([A-Z]{3})</td>\\s*" +                                      // IATA-Code
-//                                "<td>.*?</td>\\s*" +                                             // ICAO (nicht extrahiert)
-//                                "<td>.*?>(.*?)</a></td>\\s*" +                                   // Name des Flughafens
-//                                "<td>.*?>(.*?)</a></td>\\s*" +                                   // Stadt / Location
-//                                "<td>.*?</td>\\s*" +                                             // Region (überspringen)
-//                                "<td>.*?>(.*?)</a>",                                             // Land
-//                        Pattern.DOTALL
-                    "<tr>\\s*" +
-                            "<td>([A-Z]{3})</td>\\s*" +                              // Gruppe 1: IATA
-                            "<td>[^<]*</td>\\s*" +                                   // ICAO ignorieren
-                            "<td>(?:<a[^>]*>)?([^<]+)(?:</a>)?</td>\\s*" +           // Gruppe 2: Name
-                            "<td><a[^>]*>([^<]+)</a></td>\\s*" +                     // Gruppe 3: Stadt
-                            "<td><a[^>]*>([^<]+)</a></td>\\s*" +                     // Gruppe 4: Region
-                            "<td><a[^>]*>([^<]+)</a>\\s*</td>\\s*" +                 // Gruppe 5: Land
-                            "</tr>",                               // Land
+//
+                    "<tr[^>]*>\\s*" +
+                            "<td>([A-Z]{3})</td>\\s*" +                              // IATA Code muss aus drei Buchstaben bestehen
+                            "<td>[^<]*</td>\\s*" +                                   // ICAO ändern in den code
+                            "<td>(?:<a[^>]*>)?([^<]+)(?:</a>)?</td>\\s*" +           //Name
+                            "<td><a[^>]*>([^<]+)</a>\\s*</td>\\s*" +                     //Stadt
+                            "<td><a[^>]*>([^<]+)</a>\\s*</td>\\s*" +                     //Region
+                            "<td><a[^>]*>([^<]+)</a>\\s*</td>\\s*" +                 // Land
+                            "</tr>",
                     Pattern.DOTALL
             );
 
@@ -68,19 +61,15 @@ public class IATAAirportParser  extends AbstractParser{
 
                 String iataCode = matcher.group(1);
                 String airportName = matcher.group(2);
-                String city = matcher.group(3);
-                String country = matcher.group(4);
+                String region = matcher.group(3)+ " ," + matcher.group(4);
+                String country = matcher.group(5);
 
 
-                airports.add(new Airport(iataCode, airportName, city, country));
+                airports.add(new Airport(iataCode, airportName, region, country));
 
 
             }
-        }
-        //System.out.println("Flughäfen: " + counter );
-        //System.out.println(data);
-        for (Airport airport : airports) {
-            System.out.println(airport);
+            scanner.close();
         }
         return airports;
     }
@@ -88,4 +77,3 @@ public class IATAAirportParser  extends AbstractParser{
 
 
 }
-

@@ -28,63 +28,38 @@ public class IATAAirlineParser extends AbstractParser<Airline> {
         // öffnet einen Scanner zum Lesen Seite "Liste_der_IATA-Airline-Codes.html"
         Scanner scanner = new Scanner(iataPagePath.toUri().toURL().openStream(),
                 StandardCharsets.UTF_8);
-        String data = scanner.useDelimiter("\\A").hasNext() ? scanner.next() : "Inhalt ist leer"; //ggf durch files ersetzen
 
-        scanner.close();
+        //Inhalt wird in einen String verwandelt, nimmt alles aus dem Dokument als Inhalt
+        String data = scanner.useDelimiter("\\A").next();
+
+
+        //erzeugt Pattern um
 
         Pattern pattern = Pattern.compile(
-//                "<tr[^>]*>\\s*" +
-//                "<td>([A-Z0-9]{2})</td>\\s*" +
-//                        "<td>(?:<a[^>]*>)?(.*?)(?:</a>)?</td>\\s*" +
-//                        "<td>(?:(?:<a[^>]*>)?(.*?)(?:</a>)?|.*?)</td>\\s*" +
-//                        "<td>(.*?)\\s*</td>" +                               // Gruppe 4: Comment
-//                "</tr>",
-                "<tr[^>]*>\\s*" +
-                        "<td>([A-Z0-9]{2})</td>\\s*" +                         // Gruppe 1: IATA
-                        "<td>(?:<a[^>]*>)?([^<]+)(?:</a>)?</td>\\s*" +         // Gruppe 2: Name
-                        "<td>(?:<a[^>]*>)?([^<]+)(?:</a>)?</td>\\s*" +         // Gruppe 3: Country
-                        "<td>((?:(?:<a[^>]*>)?([^<]*)</a>?|[^<>])*)</td>\\s*" +// Gruppe 4: Kommentar: alles Sichtbare (auch in <a>)
+                "<tr[^>]*>\\s*" + // start
+                        "<td>([A-Z0-9]{2})</td>\\s*" +                         // erlaubt genau 2 Buchstaben oder Ziffern
+                        "<td>(?:<a[^>]*>)?([^<]+)(?:</a>)?</td>\\s*" +         // Name
+                        "<td>(?:<a[^>]*>)?([^<]+)(?:</a>)?</td>\\s*" +         // Land
+                        "<td>([^<]*)</td>\\s*" + //Kommentar
                         "</tr>",
-//                "<td>([A-Z0-9]{2})</td>\\s*" +                                     // Code
-//                        "<td>(?:<a[^>]*>)?(.*?)(?:</a>)?</td>\\s*" +                       // Airline-Name
-//                        "<td>(?:<a[^>]*>)?(.*?)(?:</a>)?</td>\\s*" +                       // Land
-//                       "<td>(.*?)</td>",
-              //  "<tr[^>]*>\\s*" +
-//                        "<td>([A-Z0-9]{2})</td>\\s*" +                                   // Code
-//                        "<td>(?:<a[^>]*>)?(.*?)(?:</a>)?</td>\\s*" +                     // Name
-//                        "<td>(?:<a[^>]*>)?(.*?)(?:</a>)?</td>\\s*" +                     // Land
-//                        "<td>(.*?)</td>\\s*" +                                           // Kommentar (kann mehrere <a> enthalten)
-//                        "</tr>",
-//                "<tr[^>]*>\\s*" +
-//                        "<td>([A-Z0-9]{2})</td>\\s*" +                           // IATA-Code
-//                        "<td>(?:<a[^>]*>)?([^<]+)(?:</a>)?</td>\\s*" +           // Name
-//                        "<td>(?:<a[^>]*>)?([^<]+)(?:</a>)?</td>\\s*" +           // Country
-//                        "<td>(.*?)</td>\\s*" +                                   // Kommentar (HTML erlaubt!)
-//                        "</tr>",
-                 Pattern.DOTALL
+                Pattern.DOTALL
 
 
         );
+
 
         Matcher matcher = pattern.matcher(data);
         while (matcher.find()) {
             String IATACode = matcher.group(1);
             String name = matcher.group(2);
             String country = matcher.group(3);
-            String comment = matcher.group(4).replaceAll("<[^>]+>", "").trim();
+            String comment = matcher.group(4).trim();
 
-
+            //airline wird zu Liste hinzugefügt
             airlines.add(new Airline(IATACode, name, country, comment));
 
         }
-        //test methode, muss gelöscht werdenn
-        for (Airline airline : airlines) {
-            System.out.println(airline);
-        }
-
-
+        scanner.close();
         return airlines;
     }
-
-
 }
