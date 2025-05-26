@@ -2,36 +2,13 @@ package air;
 
 import java.util.Objects;
 
-public class Airline implements AirInterface {
+public class Airline extends AbstractAir {
 
-    private final String iataCode;
-    private final String name;
-    private final String country;
     private final String comment;
 
-    public Airline(){
-        this("","","","");
-    }
-
-    public Airline(String iataCode, String name, String country, String comment) {
-        this.iataCode = iataCode;
-        this.name = name;
-        this.country = country;
+    public Airline(String iataCode, String name, String comment, String country) {
+        super(iataCode, name, country);
         this.comment = comment;
-    }
-
-    public String getIataCode() {
-        return iataCode;
-    }
-
-    public String getName() {
-
-        return name;
-    }
-
-    public String getCountry() {
-
-        return country;
     }
 
     public String getComment() {
@@ -43,16 +20,17 @@ public class Airline implements AirInterface {
     public boolean equals(Object o) {
         if (o == null || getClass() != o.getClass()) return false;
         Airline airline = (Airline) o;
-        return Objects.equals(iataCode, airline.iataCode) && Objects.equals(name, airline.name) && Objects.equals(country, airline.country) && Objects.equals(comment, airline.comment);
+        return super.equals(o) && Objects.equals(comment, airline.comment);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(iataCode, name, country, comment);
+
+        return Objects.hash(super.hashCode(), comment);
     }
 
     @Override
-    public String toString() {
-        return String.format("%s[%s, %s, %s, %s]", getClass().getSimpleName(),iataCode, name,country, comment);
+    public String toStringAddon() {
+        return this.comment;
     }
 }

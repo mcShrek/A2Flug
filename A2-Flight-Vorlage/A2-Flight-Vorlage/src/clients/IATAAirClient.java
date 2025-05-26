@@ -9,6 +9,7 @@ import queries.AirportQuery;
 
 import java.io.IOException;
 import java.util.List;
+import java.util.function.Predicate;
 
 public class IATAAirClient {
 
@@ -35,6 +36,9 @@ public class IATAAirClient {
         for ( Airport port : airportQuery.filterByIATAPrefix("UR")) {
             System.out.println(port);
           }
+        for ( Airport port : airportQuery.filterBy(airport -> airport.getIataCode().startsWith("UR"))) {
+            System.out.println(port);
+        }
 
     }
 }

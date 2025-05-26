@@ -33,14 +33,12 @@ public class IATAAirlineParser extends AbstractParser<Airline> {
         String data = scanner.useDelimiter("\\A").next();
 
 
-        //erzeugt Pattern um
-
         Pattern pattern = Pattern.compile(
                 "<tr[^>]*>\\s*" + // start
                         "<td>([A-Z0-9]{2})</td>\\s*" +                         // erlaubt genau 2 Buchstaben oder Ziffern
                         "<td>(?:<a[^>]*>)?([^<]+)(?:</a>)?</td>\\s*" +         // Name
                         "<td>(?:<a[^>]*>)?([^<]+)(?:</a>)?</td>\\s*" +         // Land
-                        "<td>([^<]*)</td>\\s*" + //Kommentar
+                        "<td>(?:<a[^>]*>)?([^<]+)(?:</a>)?</td>\\s*" +        //Kommentar
                         "</tr>",
                 Pattern.DOTALL
 
@@ -56,7 +54,7 @@ public class IATAAirlineParser extends AbstractParser<Airline> {
             String comment = matcher.group(4).trim();
 
             //airline wird zu Liste hinzugefügt
-            airlines.add(new Airline(IATACode, name, country, comment));
+            airlines.add(new Airline(IATACode, name, comment, country));
 
         }
         scanner.close();

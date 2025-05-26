@@ -15,8 +15,7 @@ public abstract class AbstractParser <T extends AirInterface> implements AirPars
         this.iataPagePath = Paths.get(resourceRoot, iataPagePath);
     }
     public AbstractParser(String resourceRoot, String iataPagePath, String iataCodesDir){
-        this.resourceRoot = resourceRoot;
-        this.iataPagePath = Paths.get(resourceRoot, iataPagePath);
+        this(resourceRoot, iataPagePath);
         this.iataCodesDir = iataCodesDir;
     }
 }

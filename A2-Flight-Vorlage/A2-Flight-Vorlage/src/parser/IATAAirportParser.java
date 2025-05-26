@@ -47,10 +47,10 @@ public class IATAAirportParser  extends AbstractParser<Airport>{
 //
                     "<tr[^>]*>\\s*" +
                             "<td>([A-Z]{3})</td>\\s*" +                              // IATA Code muss aus drei Buchstaben bestehen
-                            "<td>[^<]*</td>\\s*" +                                   // ICAO ändern in den code
+                            "<td>[^<]*</td>\\s*" +                                   // ICAO
                             "<td>(?:<a[^>]*>)?([^<]+)(?:</a>)?</td>\\s*" +           //Name
-                            "<td><a[^>]*>([^<]+)</a>\\s*</td>\\s*" +                     //Stadt
-                            "<td><a[^>]*>([^<]+)</a>\\s*</td>\\s*" +                     //Region
+                            "<td><a[^>]*>([^<]+)</a>\\s*</td>\\s*" +                 //Stadt
+                            "<td><a[^>]*>([^<]+)</a>\\s*</td>\\s*" +                 //Region
                             "<td><a[^>]*>([^<]+)</a>\\s*</td>\\s*" +                 // Land
                             "</tr>",
                     Pattern.DOTALL
@@ -61,7 +61,7 @@ public class IATAAirportParser  extends AbstractParser<Airport>{
 
                 String iataCode = matcher.group(1);
                 String airportName = matcher.group(2);
-                String region = matcher.group(3)+ " ," + matcher.group(4);
+                String region = matcher.group(3)+ " in " + matcher.group(4);
                 String country = matcher.group(5);
 
 
